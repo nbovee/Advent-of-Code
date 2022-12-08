@@ -1,8 +1,7 @@
-# could also read entire file, split on '\n\n' to find elves, then map to list.
+# first pass, covers both parts
 elves = [[]]
 with open("input/01.txt", "r")as input:
     for line in input:
-        i += 1
         if line == '\n':
             elves.append([])
         else:

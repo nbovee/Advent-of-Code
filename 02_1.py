@@ -12,7 +12,7 @@ score = {
 score2 = {
     'A X' : 3, # rock lose
     'B X' : 1, # paper lose
-    'C X' : 2, # scissors ose
+    'C X' : 2, # scissors lose
     'A Y' : 4, # rock draw
     'B Y' : 5, # paper draw
     'C Y' : 6, # scissors draw
@@ -21,7 +21,7 @@ score2 = {
     'C Z' : 7  # scissors win
 }
 sum = 0
-with open("input/02_1", "r") as input:
+with open("input/02.txt", "r") as input:
     for line in input:
         print(line, end='')
         sum+=score2[line.rstrip()]

@@ -1,6 +1,6 @@
-# efficiency pass
+# second efficiency pass because it's cooler, covers both parts
 import heapq
-# structure for elves[ elf[[priority], ...]
+# structure for elves[ elf[priority, [items]], ...]
 elves = [] 
 with open("input/01.txt", "r")as input:
     elves = list((map(int, line.strip().split('\n'))) for line in input.read().split('\n\n'))
@@ -9,4 +9,4 @@ heapq.heapify(elves)
 total = 0
 for i in range(3):
     total += abs(heapq.heappop(elves)[0])
-print(total)
+    print(total)
