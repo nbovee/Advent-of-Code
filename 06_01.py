@@ -3,13 +3,12 @@ signal = advent.get_input(__file__).pop()
 
 packet_end_offset = 4
 message_end_offset = 14
-find_packet = True
 
-for i in range(len(signal) - packet_end_offset):
-    if len(set(signal[i:i+packet_end_offset])) == packet_end_offset:    
-        print(i + packet_end_offset)
-        if find_packet:
-            find_packet = not find_packet
-            packet_end_offset = message_end_offset
-        else: 
-            break
+def signal_scanner(_signal, offset):
+    for i in range(len(_signal) - offset):
+        if len(set(_signal[i:i + offset])) == offset:    
+            return i + offset
+
+packet_start = signal_scanner(signal, packet_end_offset)
+print(packet_start)
+print(signal_scanner(signal[packet_start:], message_end_offset) + packet_start)
