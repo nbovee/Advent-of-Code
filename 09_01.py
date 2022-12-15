@@ -4,7 +4,9 @@ instructions = advent.get_input(__file__)
 class Rope():
     def __init__(self, len) -> None:
         self.knots = [Knot() for x in range(len)]
-        self.tail_visited = self.knots[-1].tail_visited
+        
+    def tail_visited(self, index):
+        return self.knots[index].tail_visited
     
     def move(self, direction, count):
         for i in range(int(count)):
@@ -75,12 +77,11 @@ class Knot():
             raise Exception("desync'd somehow, probably with _set_head_loc()")
         self.tail_visited.add(self.tail_loc)
     
-rope1 = Rope(1)
-rope9 = Rope(9)
+rope = Rope(10)
 for instr in instructions:
-    rope1.move(*instr.split())
-    rope9.move(*instr.split())
-print(len(rope1.tail_visited))
-print(len(rope9.tail_visited))
+    rope.move(*instr.split())
+    
+print(len(rope.tail_visited(0)))
+print(len(rope.tail_visited(9)))
 
 
