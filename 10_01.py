@@ -1,14 +1,14 @@
 import common_advent as advent
 instructions = advent.get_input(__file__)
 
-def signal_processing(_instructions, _responses, display = False):  
+def signal_processing(_instructions, _responses):  
     
     cycle, x = 0, 1
     out = ''
 
     def draw_range(dist = 1, width = 40):
         base = cycle % width
-        return True if x in list(range(base - dist, base + dist + 1)) else False
+        return True if x in range(base - dist, base + dist + 1) else False
 
     for instruction in _instructions:
         cycle_step = 1
@@ -28,5 +28,5 @@ def signal_processing(_instructions, _responses, display = False):
         print(out[i:i+40])
 
 intervals = [20, 60, 100, 140, 180, 220]
-l1 = list(signal_processing(instructions, intervals, display = True))
+l1 = list(signal_processing(instructions, intervals))
 print(f"Sum of interval responses for part 1: {sum(l1)}")
