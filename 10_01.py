@@ -6,7 +6,7 @@ def signal_processing(_instructions, _responses):
     cycle, x = 0, 1
     out = ''
 
-    def draw_range(dist = 1, width = 40):
+    def in_draw_range(dist = 1, width = 40):
         base = cycle % width
         return True if x in range(base - dist, base + dist + 1) else False
 
@@ -19,7 +19,7 @@ def signal_processing(_instructions, _responses):
             cycle_step += 1
             
         for i in range(cycle_step):
-            out+= '#' if draw_range() else ' '
+            out+= '#' if in_draw_range() else ' '
             cycle += 1
             if cycle in _responses:
                 yield x * cycle # yield before applying value from prev cycle
