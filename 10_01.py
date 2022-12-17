@@ -24,7 +24,7 @@ def signal_processing(_instructions, _responses):
             if cycle in _responses:
                 yield x * cycle # yield before applying value from prev cycle
         x += delta
-    for i in range(0,240,40):
+    for i in range(0,220,40):
         print(out[i:i+40])
 
 intervals = [20, 60, 100, 140, 180, 220]
