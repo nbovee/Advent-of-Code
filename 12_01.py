@@ -41,6 +41,7 @@ def find_endpoints(_map):
             S = (i, _map[i].find('S'))
         if _map[i].find('E') > -1:
             E = (i, _map[i].find('E'))
+    assert S is not None and E is not None
     return S, E
 
 for r in range(len(map)):
