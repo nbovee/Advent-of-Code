@@ -18,19 +18,14 @@ class Cave():
     def add_element(self, _location, material):
         if _location not in list(self.occupied_dict.keys()) and material != self.air: # as is, air does not take occupy space
             self.occupied_dict[_location] = material
-            r_key_list = [r for r, c in self.occupied_dict.keys()]
-            c_key_list = [c for r, c in self.occupied_dict.keys()]
-            c_min_height = min(c_key_list)
-            c_max_height = max(c_key_list) + 2 # overestimate to use as floor later as well
-            r_min_height = min(r_key_list)
-            r_max_height = max(r_key_list) + 1
-            self.area_bounds = [r_min_height, r_max_height, c_min_height, c_max_height] # row- row+ col- col+ 
+            self.display_bounds = advent.display_bounds(self.occupied_dict.keys())#[r_min_height, r_max_height, c_min_height, c_max_height] # row- row+ col- col+ 
+            self.display_bounds[1] += 1 # bump higher, as we use as the floor value later
             self.sand_count += 1 if material == self.sand else 0
 
     def __str__(self) -> str:
         out = ''
-        for c in range(self.area_bounds[2], self.area_bounds[3] + 1):
-            for r in range(self.area_bounds[0], self.area_bounds[1] + 1):
+        for c in range(self.display_bounds[2], self.display_bounds[3] + 1):
+            for r in range(self.display_bounds[0], self.display_bounds[1] + 1):
                 if (r, c) in self.occupied_dict.keys():
                     out += self.occupied_dict[(r, c)]
                 else:
@@ -44,10 +39,10 @@ class Cave():
         for r in range(abs(start_point[0] - end_point[0]) + 1):
             for c in range(abs(start_point[1] - end_point[1]) + 1):
                 self.add_element((r + start_point[0], c + start_point[1]), self.rock)
-        self.floor_row = self.area_bounds[3]
+        self.floor_row = self.display_bounds[3]
 
     def furthest_vertical_unoccupied(self, _location): # speed up solution by searching ahead for collision.
-        for c in range(_location[1] + 1, self.area_bounds[3]+1):
+        for c in range(_location[1] + 1, self.display_bounds[3]+1):
             if (_location[0], c) in list(self.occupied_dict.keys()):
                 return _location[0], c - 1 # 1 above the occupied
         return (_location[0], self.floor_row) - 1 if self.has_floor is True else None # either the item falls into space, or hits an infinite floor
@@ -96,5 +91,5 @@ def crunch(cave: Cave, display = False):
         print(cave)
     return cave.sand_count # indicates successful placement
 
-print(f"Amount of sand to overflow map: {crunch(cave_1)}")
+print(f"Amount of sand to overflow map: {crunch(cave_1, display=True)}")
 print(f"Amount of sand to cover source location: {crunch(cave_2) + 1}") # currently we exit rather than cover the source block, so off by one. Could cover this case but more lines so eh
