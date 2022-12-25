@@ -61,27 +61,30 @@ def intersects_in_line(_test_row):
     return _occupied_set_in_row
 
 
-min_range = 2000000
+min_range = 0
 row_one = intersects_in_line(min_range - 0)
 row_two = intersects_in_line(min_range - 1)
 row_thr = None
 candidates = set()
-# for i in range(min_range - 2, max_range + 1):
-#     row_thr = intersects_in_line(i)
-#     for cell in row_thr.union(row_one):
-#         if cell - 1 in row_two and cell + 1 in row_two: # diamond pattern candidacy
-#             print(f"Candidate: {i}")
-#             candidates.add(i)
-#             break
-#             # if len(row_two) >= 2 and len(row_thr.union(row_one))>0: # candidate crtieria
-#     row_one = row_two
-#     row_two = row_thr
-#     if i % 10000 == 0:
-#         print(f"{i/(max_range + 1):2.2%}")
+test_set = set([x for x in range(max_range + 1)])
 
-print(candidates) # {3230813}
 
+for i in range(min_range + 2, max_range + 1):
+    row_thr = intersects_in_line(i)
+    # print(list(row_thr.intersection(test_set)))
+    if test_set.intersection(row_one).intersection(row_thr):
+        # if {cell + 1, cell - 1} in row_two and cell not in row_two: # diamond pattern candidacy
+            print(f"Candidate: {i}")
+            candidates.add(i)
+            # break # one possibility is all we need
+    row_one = row_two
+    row_two = row_thr
+    if i % (max_range//100) == 0:
+        print(f"{i/(max_range + 1):2.2%}")
+
+print(candidates) # 
 candidates = {2380928, 2380930, 3230813}
+print(candidates) # 
 
 def iterate_segments(_test_row):
     test_row = _test_row
@@ -96,9 +99,12 @@ def iterate_segments(_test_row):
                 _occupied_set_in_row.update([x for x in range(intersect2_col, intersect3_col+1)])
             if intersect0_col is not None:
                 _occupied_set_in_row.update([x for x in range(intersect0_col, intersect1_col+1)])
-    return _occupied_set_in_row
+    filter_set = set(range(0,max_range + 1))
+    return _occupied_set_in_row.intersection(filter_set)
 
 
 test_set = set([x for x in range(max_range + 1)])
 for candidate in candidates:
-    print(len(test_set.difference(iterate_segments(candidate))))
+    temp = iterate_segments(candidate)
+    print(len(temp))
+    print(len(test_set.difference(temp)))
