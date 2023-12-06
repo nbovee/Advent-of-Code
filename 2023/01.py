@@ -21,14 +21,14 @@ for x in conv.items():
     key_val_list.extend(x)
 key_val_re = re.compile("|".join(key_val_list))
 
-def day1(regex, replace = []):
+def day1(regex, replace = dict()):
     sum = 0
     for i in input:
         rep = re.findall(regex, i)
         if replace:
             for e, r in enumerate(rep):
                 if r in replace:
-                    rep[e] = conv[r]
+                    rep[e] = replace[r]
         sum += int(f"{rep[0]}{rep[-1]}")
     return sum
 
