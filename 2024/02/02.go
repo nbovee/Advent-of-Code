@@ -40,13 +40,17 @@ func main() {
 			passing_damped += 1
 		} else {
 			// Since the index
-			valid_r, _ := validateReport(prune(report, damp))
-			valid_l, _ := validateReport(prune(report, damp-1))
+			valid_0, _ := validateReport(prune(report, damp))
+			valid_1, _ := validateReport(prune(report, damp-1))
+			valid_2, _ := validateReport(prune(report, damp-2))
 
-			if valid_l || valid_r {
-				fmt.Println("Damped")
+			valid = valid_0 || valid_1 || valid_2
+			if valid {
 				passing_damped += 1
 			}
+		}
+		if !valid {
+			fmt.Printf("Failed 3x %v\n", report)
 		}
 	}
 
@@ -104,15 +108,13 @@ val_loop:
 			break val_loop
 		}
 	}
-	if !valid.valid {
-		fmt.Printf("Failed %v\n", report)
-	} else {
-		fmt.Printf("Passed %v\n", report)
-	}
 	return valid.valid, valid.index
 }
 
 func prune(report []int, remove int) []int {
+	if remove < 0 {
+		return make([]int, 2)
+	}
 	dupeReport := make([]int, len(report))
 	copy(dupeReport, report)
 	return append(dupeReport[:remove], dupeReport[remove+1:]...)
