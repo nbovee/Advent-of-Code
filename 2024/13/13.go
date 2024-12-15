@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"sort"
@@ -42,98 +43,86 @@ func main() {
 	B_cost := 1
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		// scan 1 is button A
-		// scan 2 is button B
-		// scan 3 is prize info
 		// scan 4 is null
 		line := scanner.Text()
 		button_A := re_button.FindAllStringSubmatch(line, -1)
-		A_x := atoi(button_A[0][1])
-		A_y := atoi(button_A[1][1])
-		_ = A_x
-		_ = A_y
 		scanner.Scan()
 		line = scanner.Text()
 		button_B := re_button.FindAllStringSubmatch(line, -1)
-		B_x := atoi(button_B[0][1])
-		B_y := atoi(button_B[1][1])
-		_ = B_x
-		_ = B_y
 		scanner.Scan()
 		line = scanner.Text()
 		prize := re_prize.FindAllStringSubmatch(line, -1)
-		P_x := atoi(prize[0][1])
-		P_y := atoi(prize[1][1])
 		scanner.Scan()
-		// A_limit := min(P_x/A_x, P_y/A_y)
-		// B_limit := min(P_x/B_x, P_y/B_y)
-		// preferB := A_limit * A_cost > B_limit * B_cost
 
-		// fmt.Printf("With Prize at %d,%d, A+%d,+%d can be pressed up to %d times.\n", P_x, P_y, A_x, A_y, A_limit)
-		// fmt.Printf("With Prize at %d,%d, B+%d,+%d can be pressed up to %d times.\n\n", P_x, P_y, B_x, B_y, B_limit)
-		// scores := []Solution{}
+		A_x, _ := strconv.Atoi(button_A[0][1])
+		A_y, _ := strconv.Atoi(button_A[1][1])
+		B_x, _ := strconv.Atoi(button_B[0][1])
+		B_y, _ := strconv.Atoi(button_B[1][1])
+		P_x, _ := strconv.Atoi(prize[0][1])
+		P_y, _ := strconv.Atoi(prize[1][1])
 
-		// for i := range min(A_limit, 100) {
-		// 	for j := range min(B_limit, 100) {
-		// 		if A_x*i+B_x*j == P_x && A_y*i+B_y*j == P_y {
-		// 			//prize found.
-		// 			scores = append(scores, Solution{i, j, i*A_cost + j*B_cost})
-		// 		}
-		// 	}
-		// }
-		// sort.Sort(ByScore(scores))
-		// if len(scores) > 0 {
-		// 	answer_1 += scores[0].score
-		// }
-
+		// for part 1 we process the naive solution as usual
+		A_limit := min(P_x/A_x, P_y/A_y, 100)
+		B_limit := min(P_x/B_x, P_y/B_y, 100)
 		scores := []Solution{}
+
+		for i := range A_limit {
+			for j := range B_limit {
+				if A_x*i+B_x*j == P_x && A_y*i+B_y*j == P_y {
+					scores = append(scores, Solution{i, j, i*A_cost + j*B_cost})
+				}
+			}
+		}
+		sort.Sort(ByScore(scores))
+		if len(scores) > 0 {
+			answer_1 += scores[0].score
+		}
+
+		// in p2 lets just solve with linear algebra (we probably need to use floats  )
+		// set up a matrix, check the determinant, and proceed accordingly
+		// Px = Ax Bx * Ap
+		// Py   Ay By   Bp
+		//
+		// Px = Ap*Ax + Bp*Bx
+		// Py   Ap*Ay + Bp*By
+		// The determinant tells us if the matrix is linearly dependant (if a row is some combination of another)
+		// For our 2d matrix that is simply Ax*By - Ay*Bx
+		// if it is 0, there are multiple solutions and we must use the token costs of a press to find the optimal
+		// if it is not 0. there is only one solution and we can solve the system of equations
 		offset := 10000000000000
 		P_x += offset
 		P_y += offset
-		// A_limit = min(P_x/A_x, P_y/A_y)
-		// B_limit = min(P_x/B_x, P_y/B_y)
-		// now that we are in P2 let us do the non-naive solution
-		// rather than check if the values of each button appear in the factors of the prize location
-		// for P(x,y), both components of at least one button must be in the factors to be worth checking.
+		var A_p, B_p, r_a, r_b float64
+		determinant := float64(A_x)*float64(B_y) - float64(B_x)*float64(A_y)
+		if determinant != 0 {
+			// system of equations with Cramer's Rule
+			detA := float64(P_x)*float64(B_y) - float64(P_y)*float64(B_x)
+			detB := float64(A_x)*float64(P_y) - float64(P_x)*float64(A_y)
+			A_p = detA / determinant
+			B_p = detB / determinant
 
-		// we can also assume some minimum number of button presses to start the search
-		// the prize is un
+		} else {
+			// find the cheapest solution by comparing our two buttons number of presses and cost
+			// how many presses of each would be required?
+			_A_p := P_x / A_x
+			_B_p := P_x / B_x
 
-		// if the remainder of P_x%B_x is not a factor of A_x or 0, that cannot be a solution
-
-		// Button A: X+94, Y+34
-		// Button B: X+22, Y+67
-		// Prize: X=8400, Y=5400
-
-		// 8400%94 = 12
-		//
-		// PRIME FACTORIZATION
-		for i := range P_x {
-			// we can split a prize location into two components, and if both halves can be respectively %==0, than it is a possible split location
-			// after we mark it as a candidate, we can test on P_y in the next step.
-			if i%A_x == 0 && (P_x-i)%B_x == 0 {
-				// find multiples and check y axis
-				_a_p := i / A_x
-				_b_p := (P_x - i) / B_x
-				if _a_p*A_y+_b_p*B_y == P_y {
-					// solution found
-					scores = append(scores, Solution{_a_p, _b_p, _a_p*A_cost + _b_p*B_cost})
-				}
+			if int(_A_p)*A_cost < int(_B_p)*B_cost {
+				A_p = float64(P_x) / float64(A_x)
+				B_p = float64(P_x%A_x) / float64(B_x)
+			} else {
+				A_p = float64(P_x%B_x) / float64(A_x)
+				B_p = float64(P_x) / float64(A_x)
 			}
-
-			sort.Sort(ByScore(scores))
-			if len(scores) > 0 {
-				answer_2 += scores[0].score
-			}
-
 		}
-		fmt.Printf("P1 %d\n", answer_1)
-		fmt.Printf("P2 %d\n", answer_2)
-
+		// A_p and B_p are floats, we need to check if they are whole numbers and therefore a valid solution
+		// this is simplest with checking with a tolerance, math.Modf() is also a good candidate
+		A_p, r_a = math.Modf(A_p)
+		B_p, r_b = math.Modf(B_p)
+		if A_p >= 0 && B_p >= 0 && r_a == 0 && r_b == 0 {
+			answer_2 += int(A_p)*A_cost + int(B_p)*B_cost
+		}
 	}
-}
-
-func atoi(s string) int {
-	r, _ := strconv.Atoi(s)
-	return r
+	fmt.Printf("P1 %d\n", answer_1)
+	fmt.Printf("P2 %d\n", answer_2)
 }
