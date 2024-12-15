@@ -10,11 +10,6 @@ import (
 	"strconv"
 )
 
-type xy struct {
-	x int
-	y int
-}
-
 type Solution struct {
 	a_press int
 	b_press int
